@@ -24,3 +24,4 @@ DEPENDENCIAS CAMARA:
 ---------------------------------------------------------
 expo install expo-media-library
 expo install expo-camera
+npx expo install expo-barcode-scanner

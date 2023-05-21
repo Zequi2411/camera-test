@@ -3,9 +3,14 @@ import { Camera, CameraType } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 import { useState, useEffect, useRef } from 'react';
 import Button from './src/components/Button';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 
 export default function App() {
+  //Variables lector de barra
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
+  const [scanData, setScanData] = useState(null);
+  
+  //Variables camara
   const [imagen, setImagen] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back) //Camara trasera
   const [flash, setFlash] = useState(Camera.Constants.FlashMode.off) //Desactivamos el flash
@@ -14,7 +19,7 @@ export default function App() {
   useEffect(() => {
     (async () =>{
       MediaLibrary.requestPermissionsAsync(); //Pedimos permiso para acceder a la libreria
-      const cameraStatus = await Camera.requestCameraPermissionsAsync(); //Pedimos permiso para acceder a la camara
+      const cameraStatus = await BarCodeScanner.requestPermissionsAsync(); //Pedimos permiso para acceder a la camara
       setHasCameraPermission(cameraStatus.status === 'granted');
     })();
   },[])
@@ -47,8 +52,23 @@ export default function App() {
     return <Text>Sin acceso a la camara</Text>
   }
 
+  const handleBarCodeScanned = ({type, data}) => {
+    setScanData(data);
+    console.log(`Data: ${data}`);
+    console.log(`Type: ${type}`);
+  }
+
   return (
+
     <View style={styles.container}>
+      <BarCodeScanner
+        onBarCodeScanned={scanData ? undefined : handleBarCodeScanned}
+        style={StyleSheet.absoluteFillObject}
+      />
+      {scanData && <Button icon={'retweet'} title={'Tap to Scan Again'} onPress={() => setScanData(undefined)} />}
+    </View>
+
+   /*  <View style={styles.container}>
       {!imagen ?
       <Camera
         style={styles.camera}
@@ -88,7 +108,7 @@ export default function App() {
         <Button title={'Escanea el producto'} icon={'camera'} onPress={sacarFoto}></Button>
         }
       </View>
-    </View>
+    </View> */
   );
 }
 
